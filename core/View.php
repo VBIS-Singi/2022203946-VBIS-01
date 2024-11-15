@@ -4,16 +4,12 @@ namespace app\core;
 
 class View {
 
-    public function render($viewName, $layoutName) {
+    public function render($viewName, $layoutName, $params)
+    {
         $layout = $this->renderLayout($layoutName);
-        $view = $this->renderPartialView($viewName);
+        $view = $this->renderPartialView($viewName, $params);
 
-        $fullView = str_replace('{{ RENDER_SECTION }}', $view, $layout);
-        echo $fullView;
-        
-        ob_start();
-        require_once __DIR__ . '/../views/' . $viewName . '.php';
-        return ob_get_clean();
+        echo str_replace("{{ RENDER_SECTION }}", $view, $layout);
     }
 
     public function renderLayout($viewName) {
@@ -22,9 +18,16 @@ class View {
         return ob_get_clean();
     }
 
-    public function renderPartialView($viewName) {
+    public function renderPartialView($viewName, $params)
+    {
+        if ($params !== null) {
+            foreach ($params as $key => $value) {
+                $$key = $value;
+            }
+        }
+
         ob_start();
-        require_once __DIR__ . '/../views/' . $viewName . '.php';
+        include_once __DIR__ . "/../views/$viewName.php";
         return ob_get_clean();
     }
 
